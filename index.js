@@ -8,7 +8,10 @@ app.get('/proxy', async (req, res) => {
   if (!targetUrl) {
     return res.status(400).send('urlパラメータが必要です');
   }
-
+app.get('/', (req, res) => {
+  res.send('プロキシサーバーが動いています');
+});
+  
   try {
     const response = await fetch(targetUrl);
     // 元のレスポンスのcontent-typeをそのまま渡す
