@@ -1,24 +1,26 @@
 const express = require('express');
-const { createProxyMiddleware } = require('http-proxy-middleware');
+const fetch = require('node-fetch'); // v2系を使う
 
 const app = express();
 
-app.use(express.json());
-
-// ルートにアクセスされたら簡単なメッセージを返す
-app.get('/', (req, res) => {
-  res.send('プロキシサーバーが動いています');
-});
-
-app.use('/proxy', (req, res, next) => {
+app.get('/proxy', async (req, res) => {
   const targetUrl = req.query.url;
-  if (!targetUrl) return res.status(400).send('urlパラメータが必要です');
+  if (!targetUrl) {
+    return res.status(400).send('urlパラメータが必要です');
+  }
 
-  createProxyMiddleware({
-    target: targetUrl,
-    changeOrigin: true,
-    pathRewrite: () => '/',
-  })(req, res, next);
+  try {
+    const response = await fetch(targetUrl);
+    // 元のレスポンスのcontent-typeをそのまま渡す
+    const contentType = response.headers.get('content-type') || 'text/html';
+    res.set('content-type', contentType);
+
+    // バイナリやテキストの判断を簡単に、ここではテキストとして返す
+    const body = await response.text();
+    res.send(body);
+  } catch (error) {
+    res.status(500).send('プロキシでエラーが発生しました');
+  }
 });
 
 const port = process.env.PORT || 3000;
