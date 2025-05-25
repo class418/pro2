@@ -5,6 +5,11 @@ const app = express();
 
 app.use(express.json());
 
+// ルートにアクセスされたら簡単なメッセージを返す
+app.get('/', (req, res) => {
+  res.send('プロキシサーバーが動いています');
+});
+
 app.use('/proxy', (req, res, next) => {
   const targetUrl = req.query.url;
   if (!targetUrl) return res.status(400).send('urlパラメータが必要です');
