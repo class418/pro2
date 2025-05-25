@@ -3,11 +3,16 @@ const fetch = require('node-fetch');
 const { URL } = require('url');
 
 const app = express();
-
-// ルートにアクセスしたらメッセージを返す
 app.get('/', (req, res) => {
-  res.send('プロキシサーバーが動いています');
+  res.send(`
+    <h1>かんたんプロキシ</h1>
+    <form action="/proxy" method="get">
+      <input type="text" name="url" placeholder="https://example.com" style="width: 300px;" />
+      <button type="submit">表示</button>
+    </form>
+  `);
 });
+
 
 // /proxy?url=指定URL でHTML取得してリンク・フォームをプロキシ経由に書き換え
 app.get('/proxy', async (req, res) => {
