@@ -55,6 +55,16 @@ app.get('/proxy', async (req, res) => {
   }
 });
 
+// script, img, linkタグのsrcやhrefも書き換え
+body = body.replace(/(src|href)=['"]?([^'"\s>]+)['"]?/gi, (match, attr, link) => {
+  try {
+    const absUrl = new URL(link, baseUrl).href;
+    return `${attr}="/proxy?url=${encodeURIComponent(absUrl)}"`;
+  } catch {
+    return match;
+  }
+});
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Proxy server listening on port ${port}`);
